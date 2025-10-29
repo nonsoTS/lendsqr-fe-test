@@ -14,7 +14,7 @@ function App() {
 
   return (
     <Routes>
-      <Route index element={<p>Home Page</p>} />
+      <Route index element={<Navigate to={USERS_ROUTE.link} replace />} />
 
       <Route element={<AuthLayout />}>
         <Route
