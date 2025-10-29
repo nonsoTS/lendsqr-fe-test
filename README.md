@@ -1,6 +1,6 @@
 # Lendsqr Admin Console - Frontend Assessment
 
-[![Netlify Status](https://api.netlify.com/api/v1/badges/your-badge-id/deploy-status)](https://chinonso-udonne-lendsqr-fe-test.netlify.app/)
+[![Netlify Status](https://api.netlify.com/api/v1/badges/beacd251-0316-4bcb-9d60-28c32950e495/deploy-status)](https://app.netlify.com/projects/chinonso-udonne-lendsqr-fe-test/deploys)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.6-blue)](https://www.typescriptlang.org/)
 [![React](https://img.shields.io/badge/React-19.1-61dafb)](https://reactjs.org/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
