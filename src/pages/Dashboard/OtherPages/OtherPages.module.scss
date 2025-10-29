@@ -1,0 +1,12 @@
+@use "../../../styles/variables" as v;
+@use "../../../styles/mixins" as m;
+
+.container {
+  font-family: WorkSans, sans-serif;
+
+  .pageTitle {
+    font-size: 24px;
+    font-weight: 500;
+    color: v.$primary-color;
+  }
+}

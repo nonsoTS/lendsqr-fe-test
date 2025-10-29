@@ -1,0 +1,52 @@
+@use "../../styles/variables" as v;
+@use "../../styles/mixins" as m;
+
+.container {
+  display: flex;
+  flex-direction: column;
+  justify-content: start;
+  align-items: stretch;
+  row-gap: 10px;
+  font-family: WorkSans, sans-serif;
+  padding-top: 20px;
+  z-index: 1000;
+
+  .mobileLogo {
+    display: none;
+    height: 20px;
+    width: 125px;
+    margin-left: 20px;
+    margin-top: 20px;
+    margin-bottom: 20px;
+
+    
+    @include m.respond-to(mobile) {
+      display: block;
+    }
+  }
+  
+  .logoutDiv{
+    padding: 20px 0;
+    border-top: 0.1rem solid #f4f4f4;
+    
+    .logout{
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: stretch;
+
+      &:hover{
+        background-color: #f3fcfc;
+      }
+    }
+
+    .logoutP{
+      padding-left: 20px;
+      color: v.$primary-color;
+      font-size: 12px;
+      font-weight: 400;
+      padding-top: 16px;
+    }
+  }
+
+}

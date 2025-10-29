@@ -1,0 +1,61 @@
+@use "../../styles/variables" as v;
+@use "../../styles/mixins" as m;
+
+.detailsCard {
+  background: white;
+  border-radius: 4px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.04);
+  padding: 30px;
+}
+
+.section {
+  margin-bottom: 32px;
+}
+
+.sectionTitle {
+  font-size: 16px;
+  font-weight: 500;
+  color: v.$primary-color;
+  margin: 0 0 24px 0;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 24px 30px;
+  
+  @include m.respond-to(large-desktop) {
+    grid-template-columns: repeat(4, 1fr);
+  }
+  
+  @include m.respond-to(desktop) {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  @include m.respond-to(laptop) {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  @include m.respond-to(mobile) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.field {
+  label {
+    display: block;
+    font-size: 11px;
+    font-weight: 500;
+    color: #545f7d;
+    margin-bottom: 6px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  p {
+    margin: 0;
+    font-size: 14px;
+    color: #545f7d;
+    font-weight: 500;
+  }
+}

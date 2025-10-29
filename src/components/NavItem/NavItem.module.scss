@@ -1,0 +1,57 @@
+@use "../../styles/variables" as v;
+@use "../../styles/mixins" as m;
+
+.navItem {
+  text-decoration: none;
+  padding-left: 30px;
+  padding-right: 30px;
+  cursor: pointer;
+  flex-grow: 1;
+
+  // Style the paragraph
+  p {
+    font-size: 16px;
+    font-weight: 400;
+    color: v.$primary-color;
+    margin: 0; // Important: remove default margins
+  }
+
+  .line{
+      display: none;
+    }
+
+  // Active state
+  &.picked {
+    background-color: #f3fcfc;
+    text-decoration: none;
+    padding-left: 30px;
+    cursor: pointer;
+    flex-grow: 1;
+    position: relative;
+
+    .line{
+      display: block;
+      width: 3px;
+      height: 40px;
+      background-color: v.$secondar-color;
+      position: absolute;
+      top: 1px;
+      left: 0px;
+    }
+  }
+
+  // Optional: hover state
+  &:hover {
+    background-color: #f3fcfc;
+  }
+}
+
+.navContent {
+  display: flex;
+  flex-direction: row;
+  justify-content: start;
+  align-items: center;
+  column-gap: 8px;
+  margin-top: 12px;
+  margin-bottom: 12px;
+}

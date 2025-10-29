@@ -1,0 +1,54 @@
+@use "../../styles/variables";
+@use "../../styles/mixins" as m;
+
+.container {
+  min-height: 100vh;
+  max-width: 100vw;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: 1fr;
+  align-items: stretch;
+  justify-content: center;
+
+  .images {
+    // display: flex;
+    // flex-direction: column;
+    // align-items: start;
+    // justify-content: center;
+    // padding-left: 6rem;
+    // padding-right: 6rem;
+
+    .topImage {
+      margin-left: 97px;
+      margin-top: 106px;
+    }
+
+    .bottomImage {
+      margin-left: 67px;
+      margin-top: 139px;
+    }
+
+    @include m.respond-to(mobile) {
+      display: none;
+    }
+  }
+
+  .formContainer {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: start;
+    padding-left: 100px;
+
+    @include m.respond-to(mobile) {
+      padding-left: 10px;
+      padding-right: 10px;
+      align-items: center;
+    }
+  }
+
+  @include m.respond-to(mobile) {
+    grid-template-columns: 1fr;
+    justify-content: center;
+  }
+}
