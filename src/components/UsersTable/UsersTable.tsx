@@ -8,11 +8,10 @@ import type {
 } from "../../utils/interfaces";
 import Skeleton from "react-loading-skeleton";
 import "react-loading-skeleton/dist/skeleton.css";
-import { useAppDispatch, useAppSelector } from "../../redux/hooks";
+import { useAppSelector } from "../../redux/hooks";
 import UsersFilter from "../UsersFilter/UsersFilter";
 import ActionMenu from "../ActionMenu/ActionMenu";
 import { shallowEqual } from "react-redux";
-import { updateFilteredUsers } from "../../redux/user/userSlice";
 import { useLocation, useNavigate, useSearchParams } from "react-router";
 import { USERS_ROUTE } from "../../utils/routes";
 
@@ -23,12 +22,13 @@ export default function UsersTable({
   setItemsPerPage,
   loadingData,
   setLoadingData,
+  filteredUsers,
+  setFilteredUsers,
 }: UsersTableProps) {
-  const dispatch = useAppDispatch();
-  const { allUsers, filteredUsers } = useAppSelector(
+  // const dispatch = useAppDispatch();
+  const { allUsers } = useAppSelector(
     (state) => ({
       allUsers: state.user.allUsers || [],
-      filteredUsers: state.user.filteredUsers || [],
     }),
     shallowEqual
   );
@@ -74,58 +74,6 @@ export default function UsersTable({
       default:
         return "";
     }
-  };
-
-  const renderPageNumbers = () => {
-    const pages: (number | string)[] = [];
-    // Number of pages to show on each side of current page
-    const delta = 1;
-
-    if (totalPages <= 7) {
-      for (let i = 1; i <= totalPages; i++) {
-        pages.push(i);
-      }
-    } else {
-      pages.push(1);
-
-      const startPage = Math.max(2, currentPage - delta);
-      const endPage = Math.min(totalPages - 1, currentPage + delta);
-
-      if (startPage > 2) {
-        pages.push("...");
-      }
-
-      for (let i = startPage; i <= endPage; i++) {
-        pages.push(i);
-      }
-
-      if (endPage < totalPages - 1) {
-        pages.push("...");
-      }
-
-      pages.push(totalPages);
-    }
-
-    return pages.map((page, index) => {
-      if (page === "...") {
-        return (
-          <span key={`ellipsis-${index}`} className={styles.paginationEllipsis}>
-            ...
-          </span>
-        );
-      }
-      return (
-        <button
-          key={page}
-          className={`${styles.paginationNumber} ${
-            currentPage === page ? styles.active : ""
-          }`}
-          onClick={() => setCurrentPage(page as number)}
-        >
-          {page}
-        </button>
-      );
-    });
   };
 
   const paginatedUsers = useMemo(() => {
@@ -209,25 +157,20 @@ export default function UsersTable({
       status: searchParams.get("status") || "",
     };
 
-    // Restore filter form state
     setFilters(urlFilters);
 
-    // Restore page number
     const page = searchParams.get("page");
     if (page) setCurrentPage(Number(page));
 
-    // Check if there are any active filters
     const hasFilters = Object.values(urlFilters).some((val) => val !== "");
 
-    console.log("hasFilters===", hasFilters, urlFilters);
-
-    // If filters exist in URL, apply them
     if (hasFilters) {
-      const filtered = applyFilters(urlFilters); // Use the reusable function
-      console.log("hasFilters===", filtered);
-      dispatch(updateFilteredUsers({ filteredUsers: filtered }));
+      const filtered = applyFilters(urlFilters);
+      setFilteredUsers(filtered);
+    } else {
+      setFilteredUsers(allUsers);
     }
-  }, [searchParams, applyFilters, dispatch, setCurrentPage]);
+  }, [searchParams, applyFilters, setFilteredUsers, setCurrentPage, allUsers]);
 
   const handleFilterChange = (field: string, value: string) => {
     setFilters((prev) => ({ ...prev, [field]: value }));
@@ -239,20 +182,18 @@ export default function UsersTable({
 
     setLoadingData(true);
 
-    // Apply filters using the reusable function
-    const filteredValues = applyFilters(filters); // Same function!
+    const filteredValues = applyFilters(filters);
 
     // Update URL with current filters
     const params: Record<string, string> = {};
     Object.entries(filters).forEach(([key, value]) => {
       if (value) params[key] = value;
     });
-    params.page = "1"; // Reset to first page
+    params.page = "1";
 
-    setSearchParams(params); // This updates the URL
-
-    // Update Redux state
-    dispatch(updateFilteredUsers({ filteredUsers: filteredValues }));
+    // This updates the URL
+    setSearchParams(params);
+    setFilteredUsers(filteredValues);
     setCurrentPage(1);
     setShowFilterDropdown(false);
     setLoadingData(false);
@@ -260,8 +201,8 @@ export default function UsersTable({
 
   const handleResetFilters = () => {
     setLoadingData(true);
-    setSearchParams({}); // Clear all URL params
-    dispatch(updateFilteredUsers({ filteredUsers: allUsers }));
+    setSearchParams({});
+    setFilteredUsers(allUsers);
     setFilters({
       organization: "",
       username: "",
@@ -279,6 +220,58 @@ export default function UsersTable({
     setSearchParams((prev) => {
       prev.set("page", page.toString());
       return prev;
+    });
+  };
+
+  const renderPageNumbers = () => {
+    const pages: (number | string)[] = [];
+    // Number of pages to show on each side of current page
+    const delta = 1;
+
+    if (totalPages <= 7) {
+      for (let i = 1; i <= totalPages; i++) {
+        pages.push(i);
+      }
+    } else {
+      pages.push(1);
+
+      const startPage = Math.max(2, currentPage - delta);
+      const endPage = Math.min(totalPages - 1, currentPage + delta);
+
+      if (startPage > 2) {
+        pages.push("...");
+      }
+
+      for (let i = startPage; i <= endPage; i++) {
+        pages.push(i);
+      }
+
+      if (endPage < totalPages - 1) {
+        pages.push("...");
+      }
+
+      pages.push(totalPages);
+    }
+
+    return pages.map((page, index) => {
+      if (page === "...") {
+        return (
+          <span key={`ellipsis-${index}`} className={styles.paginationEllipsis}>
+            ...
+          </span>
+        );
+      }
+      return (
+        <button
+          key={page}
+          className={`${styles.paginationNumber} ${
+            currentPage === page ? styles.active : ""
+          }`}
+          onClick={() => handlePageChange(page as number)}
+        >
+          {page}
+        </button>
+      );
     });
   };
 

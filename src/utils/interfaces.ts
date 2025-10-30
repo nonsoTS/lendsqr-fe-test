@@ -35,6 +35,8 @@ export interface UsersTableProps {
   setItemsPerPage: React.Dispatch<React.SetStateAction<number>>;
   loadingData: boolean;
   setLoadingData: React.Dispatch<React.SetStateAction<boolean>>;
+  filteredUsers: UserProps[] | [];
+  setFilteredUsers: React.Dispatch<React.SetStateAction<UserProps[] | []>>;
 }
 
 export interface FilterProps {

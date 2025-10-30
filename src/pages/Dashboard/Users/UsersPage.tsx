@@ -5,18 +5,12 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import type { UserProps } from "../../../utils/interfaces";
 import Skeleton from "react-loading-skeleton";
 import "react-loading-skeleton/dist/skeleton.css";
-import { useAppDispatch, useAppSelector } from "../../../redux/hooks";
+import { useAppDispatch } from "../../../redux/hooks";
 import { updateAllUsers } from "../../../redux/user/userSlice";
-import { shallowEqual } from "react-redux";
 
 export default function UsersPage() {
   const dispatch = useAppDispatch();
-  const { filteredUsers } = useAppSelector(
-    (state) => ({
-      filteredUsers: state.user.filteredUsers || [],
-    }),
-    shallowEqual
-  );
+  const [filteredUsers, setFilteredUsers] = useState<UserProps[] | []>([]);
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [itemsPerPage, setItemsPerPage] = useState<number>(10);
   const [loadingData, setLoadingData] = useState<boolean>(false);
@@ -80,8 +74,6 @@ export default function UsersPage() {
     },
   ];
 
-  console.log("filteredUsers===", filteredUsers.length);
-
   return (
     <div className={styles.container}>
       <p className={styles.pageTitle}>Users</p>
@@ -105,6 +97,8 @@ export default function UsersPage() {
         setItemsPerPage={setItemsPerPage}
         loadingData={loadingData}
         setLoadingData={setLoadingData}
+        filteredUsers={filteredUsers}
+        setFilteredUsers={setFilteredUsers}
       />
     </div>
   );
