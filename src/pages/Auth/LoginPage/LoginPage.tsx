@@ -25,13 +25,12 @@ export default function LoginPage() {
   } = useFormik({
     initialValues: initialLoginValues,
     validationSchema: loginValidationSchema,
-    onSubmit: (values, { setSubmitting }) => {
+    onSubmit: (_, { setSubmitting }) => {
       setTimeout(() => {
         setSubmitting(false);
         navigate(USERS_ROUTE.link);
         dispatch(login());
       }, 2000);
-      console.log(values);
     },
   });
 

@@ -53,7 +53,6 @@ export default function UsersTable({
   };
 
   const handleFilterSubmit = () => {
-    console.log("Applying filters:", filters);
     setShowFilterDropdown(false);
   };
 

@@ -25,7 +25,6 @@ export default function UsersPage() {
         },
       })
       .then(function (response) {
-        console.log("response=== ", response);
         if (response.status === 200) {
           setTotalData(response.data);
 
@@ -37,7 +36,8 @@ export default function UsersPage() {
           dispatch(updateUsers({ users: [...paginatedData] }));
         }
       })
-      .catch(function (error) {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      .catch(function (error: any) {
         console.log(error);
         setTotalItems(0);
         setCurrentPage(1);
