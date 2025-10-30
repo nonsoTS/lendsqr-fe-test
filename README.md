@@ -55,7 +55,9 @@ This project is a sophisticated frontend implementation of the Lendsqr Admin Con
 ## 🚀 Key Technical Achievements
 
 ### 1. URL-Based State Management Pattern
+
 **Industry Standard Pattern**: All filter and pagination states persist in URL query parameters, enabling:
+
 - 🔗 **Shareable Links**: Users can copy URLs to share exact filtered views
 - 🔙 **Browser Navigation**: Full support for back/forward buttons
 - 🔖 **Bookmarkable States**: Direct access to specific filtered views
@@ -68,7 +70,9 @@ const [searchParams, setSearchParams] = useSearchParams();
 ```
 
 ### 2. Advanced Multi-Field Filtering System
+
 **Production-Grade Filtering**: Sophisticated AND-logic filter engine with:
+
 - Organization, username, email, phone number, date range, and status filters
 - Real-time filter application with URL synchronization
 - Automatic pagination reset on filter changes
@@ -76,6 +80,7 @@ const [searchParams, setSearchParams] = useSearchParams();
 - Reusable filter logic extracted into pure functions
 
 ### 3. Dual-Layer State Architecture
+
 ```typescript
 // Data Layer (Redux)
 allUsers: User[]          // Immutable source of truth (500 records)
@@ -86,6 +91,7 @@ filteredUsers: User[]     // Computed filtered results
 ```
 
 ### 4. Performance-First Implementation
+
 - **useMemo**: Prevents expensive recalculations of filtered/paginated data
 - **useCallback**: Memoizes event handlers to prevent child re-renders
 - **Skeleton Loading**: Eliminates cumulative layout shift (CLS)
@@ -96,18 +102,21 @@ filteredUsers: User[]     // Computed filtered results
 ## ✨ Features
 
 ### Authentication
+
 - 🔐 Schema-based form validation with Yup
 - 💾 Persistent login state with Redux-Persist
 - 🎨 Responsive login page with brand imagery
 - ⚡ Inline validation feedback
 
 ### Dashboard
+
 - 📊 Real-time user statistics overview (Active Users, Loans, Savings)
 - 📱 Fully responsive grid layout adapting to screen sizes
 - 🎯 Interactive cards with hover states
 - 🎨 Visual data representation with consistent design system
 
 ### Users Management (Advanced Features)
+
 - 📋 **Comprehensive User Table**: 500 records with optimized rendering
 - 🔍 **Multi-Field Filtering**: Organization, username, email, phone, date, status
 - 🔗 **URL State Synchronization**: All filters persist in URL for shareability
@@ -118,6 +127,7 @@ filteredUsers: User[]     // Computed filtered results
 - 🔄 **Auto-Reset Pagination**: Returns to page 1 when filters change
 
 ### User Details
+
 - 👤 Comprehensive user profile with tabbed navigation
 - 💼 Organization and personal information sections
 - 📊 Financial information display (tier, bank details, loan data)
@@ -126,6 +136,7 @@ filteredUsers: User[]     // Computed filtered results
 - 🔙 Breadcrumb navigation for easy return to users list
 
 ### Additional Technical Features
+
 - 🎨 **Design System**: Consistent SCSS variables and mixins
 - ⚡ **Performance**: Comprehensive React optimization patterns
 - 💾 **Persistence**: Combined Redux-Persist + URL state strategy
@@ -139,22 +150,26 @@ filteredUsers: User[]     // Computed filtered results
 ## 🛠 Tech Stack
 
 ### Core Technologies
+
 - **React 19.1.1** - Latest stable with concurrent rendering
 - **TypeScript 5.6** - Strict mode for comprehensive type safety
 - **Vite 7.1.7** - Lightning-fast HMR and optimized production builds
 - **SASS 1.93.2** - Advanced CSS preprocessing with design system
 
 ### State Management & Routing
+
 - **Redux Toolkit** - Type-safe global state management
 - **React-Redux 9.2.0** - Official React bindings
 - **Redux-Persist 6.0.0** - Automatic localStorage synchronization
 - **React Router 7.9.4** - Declarative routing with `useSearchParams` for URL state
 
 ### UI & Form Management
+
 - **React-Loading-Skeleton 3.5.0** - Prevents layout shift with skeleton screens
 - **Yup 1.7.1** - Schema-based form validation with TypeScript
 
 ### Development & Quality
+
 - **ESLint** - Code quality and consistency
 - **TypeScript ESLint** - TypeScript-specific rules
 - **Vite Plugin React** - Fast Refresh for instant feedback
@@ -166,18 +181,21 @@ filteredUsers: User[]     // Computed filtered results
 ### Prerequisites
 
 Ensure you have the following installed:
+
 - **Node.js** (v18 or higher)
 - **npm** (v9 or higher) or **yarn**
 
 ### Installation
 
 1. **Clone the repository**
+
    ```bash
    git clone https://github.com/nonsoTS/lendsqr-fe-test.git
    cd lendsqr-fe-test
    ```
 
 2. **Install dependencies**
+
    ```bash
    npm install
    # or
@@ -185,6 +203,7 @@ Ensure you have the following installed:
    ```
 
 3. **Start the development server**
+
    ```bash
    npm run dev
    # or
@@ -192,12 +211,13 @@ Ensure you have the following installed:
    ```
 
 4. **Open your browser**
-   
+
    Navigate to `http://localhost:5173` (or the port shown in your terminal)
 
 ### Test Credentials
 
 For demonstration purposes, use any valid credentials:
+
 - **Email**: Any valid email format (e.g., `user@example.com`)
 - **Password**: Minimum 6 characters (e.g., `password123`)
 
@@ -210,6 +230,7 @@ For demonstration purposes, use any valid credentials:
 **Design Decision**: Implemented a sophisticated dual-layer state architecture separating data persistence from UI state management.
 
 #### Architecture Diagram
+
 ```typescript
 ┌─────────────────────────────────────────┐
 │         Redux Store (Data Layer)        │
@@ -233,12 +254,14 @@ For demonstration purposes, use any valid credentials:
 #### Why This Approach?
 
 **Redux for Data**:
+
 - Centralized data management for 500+ user records
 - Automatic localStorage persistence with Redux-Persist
 - Optimistic UI updates
 - Shared state across multiple components
 
 **URL for UI State**:
+
 - Makes filter states shareable (copy URL to share filtered view)
 - Enables browser back/forward navigation
 - Supports direct deep linking to specific filtered states
@@ -248,14 +271,20 @@ For demonstration purposes, use any valid credentials:
 ### Filtering Architecture
 
 **Reusable, Type-Safe Filter Logic**:
+
 ```typescript
 // Pure function for testability and reusability
 const applyFilters = (users: User[], filters: FilterParams): User[] => {
-  return users.filter(user => {
+  return users.filter((user) => {
     // AND logic: all conditions must pass
     if (filters.status && user.status !== filters.status) return false;
-    if (filters.organization && user.organization !== filters.organization) return false;
-    if (filters.username && !user.username.toLowerCase().includes(filters.username.toLowerCase())) return false;
+    if (filters.organization && user.organization !== filters.organization)
+      return false;
+    if (
+      filters.username &&
+      !user.username.toLowerCase().includes(filters.username.toLowerCase())
+    )
+      return false;
     // ... additional filter conditions
     return true;
   });
@@ -263,6 +292,7 @@ const applyFilters = (users: User[], filters: FilterParams): User[] => {
 ```
 
 **Integration Pattern**:
+
 1. User applies filters through UI
 2. Filters update URL via `setSearchParams`
 3. Component reads from URL (single source of truth)
@@ -275,6 +305,7 @@ const applyFilters = (users: User[], filters: FilterParams): User[] => {
 **Optimization Techniques**:
 
 1. **Memoized Computations**:
+
 ```typescript
 const paginatedUsers = useMemo(() => {
   const startIndex = (currentPage - 1) * itemsPerPage;
@@ -283,20 +314,26 @@ const paginatedUsers = useMemo(() => {
 ```
 
 2. **Stable Callback References**:
+
 ```typescript
-const handleFilterChange = useCallback((filters: FilterParams) => {
-  dispatch(applyFilters(filters));
-  updateURLParams(filters);
-}, [dispatch]);
+const handleFilterChange = useCallback(
+  (filters: FilterParams) => {
+    dispatch(applyFilters(filters));
+    updateURLParams(filters);
+  },
+  [dispatch]
+);
 ```
 
 3. **DOM Reference Management**:
+
 ```typescript
 const tableRef = useRef<HTMLDivElement>(null);
 // No re-renders when ref value changes
 ```
 
 **Measured Impact**:
+
 - 60% reduction in unnecessary re-renders
 - <50ms filter operation time for 500 records
 - CLS score: 0.05 (skeleton loading)
@@ -313,8 +350,7 @@ lendsqr-fe-test/
 │   ├── components/          # Reusable UI components
 │   │   ├── Sidebar/
 │   │   │   ├── Sidebar.tsx
-│   │   │   ├── Sidebar.module.scss
-│   │   │   └── Sidebar.types.ts
+│   │   │   └── Sidebar.module.scss
 │   │   ├── Navbar/
 │   │   ├── UserTable/
 │   │   ├── FilterForm/      # Advanced filtering component
@@ -322,10 +358,12 @@ lendsqr-fe-test/
 │   │   ├── StatusBadge/
 │   │   └── SkeletonLoader/
 │   ├── pages/               # Page components
-│   │   ├── Login/
-│   │   ├── Dashboard/
-│   │   ├── Users/           # Complex filter + pagination
-│   │   └── UserDetails/
+│   │   ├── Auth/
+│   │       ├── Login/
+│   │       └── Signup/
+│   │   └── Dashboard/
+│   │       ├── Users/
+│   │       └── UserDetails/
 │   ├── store/               # Redux configuration
 │   │   ├── store.ts
 │   │   └── slices/
@@ -352,6 +390,7 @@ lendsqr-fe-test/
 ```
 
 **Architecture Principles**:
+
 - **Co-location**: Related files grouped together (component + styles + types)
 - **Separation of Concerns**: Clear boundaries between UI, state, and business logic
 - **Reusability**: Extracted common patterns into utils and hooks
@@ -364,12 +403,14 @@ lendsqr-fe-test/
 ### React Performance Patterns
 
 1. **useMemo for Expensive Operations**
+
    - Filtered user list computation
    - Paginated data slicing
    - Derived statistics calculations
    - Filter option generation
 
 2. **useCallback for Stable References**
+
    - Event handlers passed to child components
    - Filter application functions
    - Pagination navigation handlers
@@ -383,12 +424,14 @@ lendsqr-fe-test/
 ### Pagination Strategy
 
 **Client-Side Implementation**:
+
 - Configurable page sizes: 10, 20, 50, 100 records
 - Memoized slice calculations
 - URL-synced page state
 - Auto-reset on filter changes
 
 **Trade-off**: All 500 records load upfront for instant filtering. Production implementation would use server-side pagination:
+
 ```
 GET /users?page=2&limit=20&status=active&organization=lendsqr
 ```
@@ -396,6 +439,7 @@ GET /users?page=2&limit=20&status=active&organization=lendsqr
 ### Skeleton Loading System
 
 **Benefits**:
+
 - Prevents cumulative layout shift (CLS)
 - Improves perceived performance
 - Maintains visual consistency
@@ -410,58 +454,41 @@ GET /users?page=2&limit=20&status=active&organization=lendsqr
 ### Mobile-First SCSS Architecture
 
 **Breakpoint Strategy**:
+
 ```scss
 $breakpoints: (
-  'mobile': 576px,        // < 576px: Single column, hamburger
-  'tablet': 768px,        // 576-768px: Adapted layouts
-  'laptop': 992px,        // 768-992px: Full sidebar
-  'desktop': 1200px,      // 992-1200px: Optimal spacing
-  'large-desktop': 1400px // > 1400px: Enhanced layouts
+  "mobile": 576px,
+  // < 576px: Single column, hamburger
+  "tablet": 768px,
+  // 576-768px: Adapted layouts
+  "laptop": 992px,
+  // 768-992px: Full sidebar
+  "desktop": 1200px,
+  // 992-1200px: Optimal spacing
+  "large-desktop": 1400px // > 1400px: Enhanced layouts,,
 );
 
 // Usage with mixin
 .user-table {
   // Mobile-first base styles
-  
-  @include respond-to('tablet') {
+
+  @include respond-to("tablet") {
     // Tablet adaptations
   }
-  
-  @include respond-to('desktop') {
+
+  @include respond-to("desktop") {
     // Desktop enhancements
   }
 }
 ```
 
 ### Responsive Features
+
 - **Navigation**: Hamburger menu with slide-out sidebar on mobile
 - **Tables**: Horizontal scroll with sticky columns
 - **Cards**: Adaptive grid (4-col → 2-col → 1-col)
 - **Touch Targets**: Minimum 44×44px for mobile interactions
 - **Typography**: Fluid scaling using `clamp()` functions
-
----
-
-## 🧪 Testing
-
-### Test Coverage Areas
-
-- ✅ Component rendering and lifecycle
-- ✅ Form validation logic
-- ✅ Redux store operations (actions, reducers, selectors)
-- ✅ Filter application and URL synchronization
-- ✅ Pagination state management
-- ✅ User interactions (clicks, form submissions)
-- ✅ Responsive behavior across breakpoints
-- ✅ Edge cases and error handling
-
-### Running Tests
-
-```bash
-npm run test
-# or
-yarn test
-```
 
 ---
 
@@ -474,11 +501,13 @@ yarn test
 ### Build & Deploy Locally
 
 1. **Build for production**
+
    ```bash
    npm run build
    ```
 
 2. **Preview production build**
+
    ```bash
    npm run preview
    ```
@@ -497,6 +526,7 @@ yarn test
 **Decision**: Redux + URL State instead of Redux only or Context API
 
 **Benefits**:
+
 - Shareable filtered views via URL
 - Browser navigation support
 - Better UX for collaborative scenarios
@@ -507,6 +537,7 @@ yarn test
 ### Why Redux-Persist over IndexedDB?
 
 **Rationale**:
+
 - Simpler implementation with Redux integration
 - Meets localStorage requirement elegantly
 - Sufficient for 500 user records (~2-3MB)
@@ -518,6 +549,7 @@ yarn test
 ### Why Vite over Create React App?
 
 **Advantages**:
+
 - 10-100x faster dev server startup
 - Instant Hot Module Replacement (HMR)
 - Optimized production builds with Rollup
@@ -530,12 +562,14 @@ yarn test
 **Current State**: All 500 records filtered/paginated in browser
 
 **Reasoning**:
+
 - Mock API constraint (no backend endpoints)
 - Demonstrates filtering capabilities
 - Instant operations without network latency
 - Mitigated performance impact with memoization
 
 **Production Approach**: Implement server-side filtering and pagination:
+
 ```typescript
 GET /api/users?
   page=2&
@@ -563,6 +597,7 @@ GET /api/users?
 ### Font Handling Strategy
 
 Where Figma fonts required paid licenses, selected visually similar Google Fonts alternatives while preserving:
+
 - Visual hierarchy
 - Readability and accessibility
 - Design intent and brand feel
@@ -573,6 +608,7 @@ Where Figma fonts required paid licenses, selected visually similar Google Fonts
 ## 🔮 Future Enhancements
 
 ### Short-Term Improvements
+
 - [ ] Enhanced filter combinations (OR logic, grouping)
 - [ ] Data export functionality (CSV, Excel, PDF)
 - [ ] Bulk user actions (multi-select, batch operations)
@@ -580,6 +616,7 @@ Where Figma fonts required paid licenses, selected visually similar Google Fonts
 - [ ] Comprehensive E2E test suite (Playwright/Cypress)
 
 ### Long-Term Goals
+
 - [ ] **Virtual Scrolling**: `react-window` for 10,000+ records
 - [ ] **Dark Mode**: Theme toggle with system preference detection
 - [ ] **Offline Support**: Service worker with background sync
@@ -590,6 +627,7 @@ Where Figma fonts required paid licenses, selected visually similar Google Fonts
 - [ ] **Performance Monitoring**: Web Vitals tracking
 
 ### Code Quality Improvements
+
 - [ ] Increase test coverage to >80%
 - [ ] Visual regression testing (Chromatic)
 - [ ] Storybook for component documentation
@@ -600,14 +638,14 @@ Where Figma fonts required paid licenses, selected visually similar Google Fonts
 
 ## 📜 Available Scripts
 
-| Script | Description |
-|--------|-------------|
-| `npm run dev` | Start development server with HMR |
-| `npm run build` | Build optimized production bundle |
-| `npm run preview` | Preview production build locally |
-| `npm run lint` | Run ESLint for code quality |
-| `npm run type-check` | TypeScript type checking |
-| `npm run test` | Run test suite |
+| Script               | Description                       |
+| -------------------- | --------------------------------- |
+| `npm run dev`        | Start development server with HMR |
+| `npm run build`      | Build optimized production bundle |
+| `npm run preview`    | Preview production build locally  |
+| `npm run lint`       | Run ESLint for code quality       |
+| `npm run type-check` | TypeScript type checking          |
+| `npm run test`       | Run test suite                    |
 
 ---
 
@@ -636,9 +674,9 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 **Chinonso Udonne**
 
 - GitHub: [@nonsoTS](https://github.com/nonsoTS)
-- LinkedIn: [Your LinkedIn Profile]
-- Portfolio: [Your Portfolio Website]
-- Email: your.email@example.com
+- LinkedIn: [Chinonso Udonne](https://www.linkedin.com/in/nonso-uj/)
+- Portfolio: [Portfolio Website](https://nonsoportfolio.netlify.app/)
+- Email: nonso.udonne@gmail.com
 
 ---
 
@@ -654,6 +692,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 ## 📞 Support
 
 For questions, issues, or feature requests:
+
 - Open an issue on [GitHub](https://github.com/nonsoTS/lendsqr-fe-test/issues)
 - Review the [documentation](https://github.com/nonsoTS/lendsqr-fe-test#readme)
 
