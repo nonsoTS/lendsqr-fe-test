@@ -3,12 +3,14 @@ import type { UserProps } from "../../utils/interfaces";
 
 export interface UserState {
   authenticated: boolean;
-  users: UserProps[];
+  filteredUsers: UserProps[];
+  allUsers: UserProps[];
 }
 
 const initialState: UserState = {
   authenticated: false,
-  users: []
+  filteredUsers: [],
+  allUsers: []
 };
 
 export const userSlice = createSlice({
@@ -19,8 +21,12 @@ export const userSlice = createSlice({
       state.authenticated = true;
     },
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    updateUsers: (state, action: PayloadAction<any>) => {
-      state.users = action.payload.users;
+    updateFilteredUsers: (state, action: PayloadAction<any>) => {
+      state.filteredUsers = action.payload.filteredUsers;
+    },
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    updateAllUsers: (state, action: PayloadAction<any>) => {
+      state.allUsers = action.payload.allUsers;
     },
     logout: (state) => {
       state.authenticated = false;
@@ -29,6 +35,6 @@ export const userSlice = createSlice({
 });
 
 // Action creators are generated for each case reducer function
-export const { login, updateUsers, logout } = userSlice.actions;
+export const { login, updateFilteredUsers, updateAllUsers, logout } = userSlice.actions;
 
 export default userSlice.reducer;

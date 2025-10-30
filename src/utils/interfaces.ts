@@ -19,7 +19,7 @@ export interface NavbarProps {
 }
 
 export interface UserProps {
-  id?: string,
+  id?: string;
   organization: string;
   username: string;
   email: string;
@@ -29,10 +29,36 @@ export interface UserProps {
 }
 
 export interface UsersTableProps {
-  totalItems: number,
-  currentPage: number,
-  setCurrentPage: React.Dispatch<React.SetStateAction<number>>
-  itemsPerPage: number,
-  setItemsPerPage: React.Dispatch<React.SetStateAction<number>>,
-  loadingData: boolean
+  currentPage: number;
+  setCurrentPage: React.Dispatch<React.SetStateAction<number>>;
+  itemsPerPage: number;
+  setItemsPerPage: React.Dispatch<React.SetStateAction<number>>;
+  loadingData: boolean;
+  setLoadingData: React.Dispatch<React.SetStateAction<boolean>>;
+}
+
+export interface FilterProps {
+  organization?: string;
+  username?: string;
+  email?: string;
+  date?: string;
+  phoneNumber?: string;
+  status?: string;
+}
+
+export interface UsersFilterProps {
+  showFilterDropdown: boolean;
+  filterRef: React.RefObject<HTMLDivElement | null>;
+  filters: FilterProps;
+  handleResetFilters: () => void;
+  handleFilterSubmit: () => void;
+  handleFilterChange: (field: string, value: string) => void;
+}
+
+export interface ActionMenuProps {
+  menuRef: React.RefObject<HTMLDivElement | null>;
+  activeMenuRow: number | null;
+  index: number;
+  row: UserProps;
+  handleUserClick: (userId?: string) => void
 }

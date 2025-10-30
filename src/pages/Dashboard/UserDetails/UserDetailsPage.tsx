@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import styles from "./UserDetailsPage.module.scss";
-import { Link, useParams } from "react-router";
-import { USERS_ROUTE } from "../../../utils/routes";
+import { useLocation, useNavigate, useParams } from "react-router";
 import GeneralDetails from "../../../components/GeneralDetails/GeneralDetails";
 import OtherTabs from "../../../components/OtherTabs/OtherTabs";
 import { useAppSelector } from "../../../redux/hooks";
@@ -16,10 +15,12 @@ const TABS = [
 ];
 
 export default function UserDetailsPage() {
-  const users = useAppSelector((state) => state.user.users || []);
+  const allUsers = useAppSelector((state) => state.user.allUsers || []);
+  const navigate = useNavigate();
+  const location = useLocation();
   const params = useParams();
   const [activeTab, setActiveTab] = useState("General Details");
-  const currentUser = users.find((user) => user.id === params.id);
+  const currentUser = allUsers.find((user) => user.id === params.id);
 
   const userData = {
     name: currentUser?.username,
@@ -30,8 +31,8 @@ export default function UserDetailsPage() {
     bank: "Providus Bank",
     personalInfo: {
       fullName: currentUser?.username,
-      phoneNumber: "07060780323",
-      emailAddress: "grace@gmail.com",
+      phoneNumber: currentUser?.phoneNumber,
+      emailAddress: currentUser?.email,
       bvn: "07060780323",
       gender: "Female",
       maritalStatus: "Single",
@@ -72,11 +73,20 @@ export default function UserDetailsPage() {
     window.scrollTo(0, 0);
   }, []);
 
+  const handleBack = () => {
+    const from = location.state?.from;
+    if (from) {
+      navigate(from);
+    } else {
+      navigate("/users");
+    }
+  };
+
   return (
     <div className={styles.container}>
-      <Link className={styles.backButton} to={USERS_ROUTE.link}>
+      <button className={styles.backButton} onClick={handleBack}>
         <span>←</span> Back to Users
-      </Link>
+      </button>
 
       <div className={styles.header}>
         <h1 className={styles.title}>User Details</h1>

@@ -5,19 +5,25 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import type { UserProps } from "../../../utils/interfaces";
 import Skeleton from "react-loading-skeleton";
 import "react-loading-skeleton/dist/skeleton.css";
-import { useAppDispatch } from "../../../redux/hooks";
-import { updateUsers } from "../../../redux/user/userSlice";
+import { useAppDispatch, useAppSelector } from "../../../redux/hooks";
+import { updateAllUsers } from "../../../redux/user/userSlice";
+import { shallowEqual } from "react-redux";
 
 export default function UsersPage() {
   const dispatch = useAppDispatch();
-  const [totalData, setTotalData] = useState<[] | UserProps[]>([]);
-  const [totalItems, setTotalItems] = useState<number>(0);
+  const { filteredUsers } = useAppSelector(
+    (state) => ({
+      filteredUsers: state.user.filteredUsers || [],
+    }),
+    shallowEqual
+  );
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [itemsPerPage, setItemsPerPage] = useState<number>(10);
   const [loadingData, setLoadingData] = useState<boolean>(false);
 
   const fetchUsers = useCallback(async () => {
     setLoadingData(true);
+
     await axios
       .get(import.meta.env.VITE_API_URL, {
         headers: {
@@ -26,46 +32,41 @@ export default function UsersPage() {
       })
       .then(function (response) {
         if (response.status === 200) {
-          setTotalData(response.data);
-
-          setTotalItems(response.data.length);
-          const paginatedData = response.data.slice(
-            (currentPage - 1) * itemsPerPage,
-            currentPage * itemsPerPage
-          );
-          dispatch(updateUsers({ users: [...paginatedData] }));
+          dispatch(updateAllUsers({ allUsers: [...response.data] }));
+        } else {
+          throw Error;
         }
       })
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       .catch(function (error: any) {
         console.log(error);
-        setTotalItems(0);
         setCurrentPage(1);
-        dispatch(updateUsers({ users: [] }));
+        dispatch(updateAllUsers({ users: [] }));
       })
       .finally(function () {
         setLoadingData(false);
       });
-  }, [currentPage, itemsPerPage, dispatch]);
+  }, [dispatch]);
 
   useEffect(() => {
     fetchUsers();
   }, [fetchUsers]);
 
   const activeUsers = useMemo(() => {
-    return totalData.filter((item: UserProps) => item?.status === "Active");
-  }, [totalData]);
+    return filteredUsers.filter((item: UserProps) => item?.status === "Active")
+      .length;
+  }, [filteredUsers]);
 
   const OVERVIEW = [
     {
       icon: "/icons/icon-4.svg",
       title: "Users",
-      value: totalItems,
+      value: filteredUsers?.length,
     },
     {
       icon: "/icons/icon-3.svg",
       title: "Active Users",
-      value: activeUsers?.length,
+      value: activeUsers,
     },
     {
       icon: "/icons/icon-2.svg",
@@ -78,6 +79,8 @@ export default function UsersPage() {
       value: "453",
     },
   ];
+
+  console.log("filteredUsers===", filteredUsers.length);
 
   return (
     <div className={styles.container}>
@@ -96,12 +99,12 @@ export default function UsersPage() {
       </div>
 
       <UsersTable
-        totalItems={totalItems}
         currentPage={currentPage}
         setCurrentPage={setCurrentPage}
         itemsPerPage={itemsPerPage}
         setItemsPerPage={setItemsPerPage}
         loadingData={loadingData}
+        setLoadingData={setLoadingData}
       />
     </div>
   );

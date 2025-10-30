@@ -1,26 +1,46 @@
-import { useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import styles from "./UsersTable.module.scss";
 import useClickOutside from "../../hooks/useClickOutside";
-import { Link } from "react-router";
-import { USERS_ROUTE } from "../../utils/routes";
-import type { UserProps, UsersTableProps } from "../../utils/interfaces";
+import type {
+  FilterProps,
+  UserProps,
+  UsersTableProps,
+} from "../../utils/interfaces";
 import Skeleton from "react-loading-skeleton";
 import "react-loading-skeleton/dist/skeleton.css";
-import { useAppSelector } from "../../redux/hooks";
+import { useAppDispatch, useAppSelector } from "../../redux/hooks";
+import UsersFilter from "../UsersFilter/UsersFilter";
+import ActionMenu from "../ActionMenu/ActionMenu";
+import { shallowEqual } from "react-redux";
+import { updateFilteredUsers } from "../../redux/user/userSlice";
+import { useLocation, useNavigate, useSearchParams } from "react-router";
+import { USERS_ROUTE } from "../../utils/routes";
 
 export default function UsersTable({
-  totalItems,
   currentPage,
   setCurrentPage,
   itemsPerPage,
   setItemsPerPage,
   loadingData,
+  setLoadingData,
 }: UsersTableProps) {
-  const users = useAppSelector((state) => state.user.users || []);
+  const dispatch = useAppDispatch();
+  const { allUsers, filteredUsers } = useAppSelector(
+    (state) => ({
+      allUsers: state.user.allUsers || [],
+      filteredUsers: state.user.filteredUsers || [],
+    }),
+    shallowEqual
+  );
+  const location = useLocation();
+  const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
+  const isInitialized = useRef(false);
   const filterRef = useRef<HTMLDivElement | null>(null);
   const menuRef = useRef<HTMLDivElement | null>(null);
   const [showFilterDropdown, setShowFilterDropdown] = useState(false);
   const [activeMenuRow, setActiveMenuRow] = useState<number | null>(null);
+  const totalPages = Math.ceil(filteredUsers.length / itemsPerPage);
 
   const [filters, setFilters] = useState({
     organization: "",
@@ -31,7 +51,15 @@ export default function UsersTable({
     status: "",
   });
 
-  const totalPages = Math.ceil(totalItems / itemsPerPage);
+  useClickOutside(
+    filterRef,
+    () => showFilterDropdown === true && setShowFilterDropdown(false)
+  );
+  useClickOutside(menuRef, () => setActiveMenuRow(null));
+
+  const toggleMenu = (index: number | null) => {
+    setActiveMenuRow(activeMenuRow === index ? null : index);
+  };
 
   const getStatusClass = (status: string) => {
     switch (status.toLowerCase()) {
@@ -47,35 +75,6 @@ export default function UsersTable({
         return "";
     }
   };
-
-  const handleFilterChange = (field: string, value: string) => {
-    setFilters((prev) => ({ ...prev, [field]: value }));
-  };
-
-  const handleFilterSubmit = () => {
-    setShowFilterDropdown(false);
-  };
-
-  const handleResetFilters = () => {
-    setFilters({
-      organization: "",
-      username: "",
-      email: "",
-      date: "",
-      phoneNumber: "",
-      status: "",
-    });
-  };
-
-  const toggleMenu = (index: number | null) => {
-    setActiveMenuRow(activeMenuRow === index ? null : index);
-  };
-
-  useClickOutside(
-    filterRef,
-    () => showFilterDropdown === true && setShowFilterDropdown(false)
-  );
-  useClickOutside(menuRef, () => setActiveMenuRow(null));
 
   const renderPageNumbers = () => {
     const pages: (number | string)[] = [];
@@ -129,6 +128,167 @@ export default function UsersTable({
     });
   };
 
+  const paginatedUsers = useMemo(() => {
+    return filteredUsers.slice(
+      (currentPage - 1) * itemsPerPage,
+      currentPage * itemsPerPage
+    );
+  }, [currentPage, itemsPerPage, filteredUsers]);
+
+  // FILTER FUNCTIONALITY
+  const applyFilters = useCallback(
+    (filterValues: FilterProps) => {
+      return allUsers.filter((item) => {
+        const orgMatch =
+          !filterValues.organization ||
+          item.organization
+            .toString()
+            .toLowerCase()
+            .includes(filterValues.organization.toLowerCase());
+
+        const usernameMatch =
+          !filterValues.username ||
+          item.username
+            .toString()
+            .toLowerCase()
+            .includes(filterValues.username.toLowerCase());
+
+        const emailMatch =
+          !filterValues.email ||
+          item.email
+            .toString()
+            .toLowerCase()
+            .includes(filterValues.email.toLowerCase());
+
+        const dateMatch =
+          !filterValues.date ||
+          item.dateJoined
+            .toString()
+            .toLowerCase()
+            .includes(filterValues.date.toLowerCase());
+
+        const phoneMatch =
+          !filterValues.phoneNumber ||
+          item.phoneNumber
+            .toString()
+            .toLowerCase()
+            .includes(filterValues.phoneNumber.toLowerCase());
+
+        const statusMatch =
+          !filterValues.status ||
+          item.status
+            .toString()
+            .toLowerCase()
+            .includes(filterValues.status.toLowerCase());
+
+        return (
+          orgMatch &&
+          usernameMatch &&
+          emailMatch &&
+          dateMatch &&
+          phoneMatch &&
+          statusMatch
+        );
+      });
+    },
+    [allUsers]
+  );
+
+  useEffect(() => {
+    // Only run once to prevent re-renders
+    if (isInitialized.current) return;
+    isInitialized.current = true;
+
+    // Read URL parameters
+    const urlFilters = {
+      organization: searchParams.get("organization") || "",
+      username: searchParams.get("username") || "",
+      email: searchParams.get("email") || "",
+      date: searchParams.get("date") || "",
+      phoneNumber: searchParams.get("phoneNumber") || "",
+      status: searchParams.get("status") || "",
+    };
+
+    // Restore filter form state
+    setFilters(urlFilters);
+
+    // Restore page number
+    const page = searchParams.get("page");
+    if (page) setCurrentPage(Number(page));
+
+    // Check if there are any active filters
+    const hasFilters = Object.values(urlFilters).some((val) => val !== "");
+
+    console.log("hasFilters===", hasFilters, urlFilters);
+
+    // If filters exist in URL, apply them
+    if (hasFilters) {
+      const filtered = applyFilters(urlFilters); // Use the reusable function
+      console.log("hasFilters===", filtered);
+      dispatch(updateFilteredUsers({ filteredUsers: filtered }));
+    }
+  }, [searchParams, applyFilters, dispatch, setCurrentPage]);
+
+  const handleFilterChange = (field: string, value: string) => {
+    setFilters((prev) => ({ ...prev, [field]: value }));
+  };
+
+  const handleFilterSubmit = () => {
+    // Check if any filters are filled
+    if (!Object.values(filters).some((item) => item !== "")) return;
+
+    setLoadingData(true);
+
+    // Apply filters using the reusable function
+    const filteredValues = applyFilters(filters); // Same function!
+
+    // Update URL with current filters
+    const params: Record<string, string> = {};
+    Object.entries(filters).forEach(([key, value]) => {
+      if (value) params[key] = value;
+    });
+    params.page = "1"; // Reset to first page
+
+    setSearchParams(params); // This updates the URL
+
+    // Update Redux state
+    dispatch(updateFilteredUsers({ filteredUsers: filteredValues }));
+    setCurrentPage(1);
+    setShowFilterDropdown(false);
+    setLoadingData(false);
+  };
+
+  const handleResetFilters = () => {
+    setLoadingData(true);
+    setSearchParams({}); // Clear all URL params
+    dispatch(updateFilteredUsers({ filteredUsers: allUsers }));
+    setFilters({
+      organization: "",
+      username: "",
+      email: "",
+      date: "",
+      phoneNumber: "",
+      status: "",
+    });
+    setCurrentPage(1);
+    setLoadingData(false);
+  };
+
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+    setSearchParams((prev) => {
+      prev.set("page", page.toString());
+      return prev;
+    });
+  };
+
+  // Navigate to user detail, passing current url
+  const handleUserClick = (userId?: string) => {
+    navigate(`${USERS_ROUTE.link}/${userId}`, {
+      state: { from: location.pathname + location.search },
+    });
+  };
+
   return (
     <div className={styles.dataTableContainer}>
       <div className={styles.tableWrapper}>
@@ -146,105 +306,14 @@ export default function UsersTable({
                 </div>
 
                 {/* FILTERS */}
-                {showFilterDropdown && (
-                  <div ref={filterRef} className={styles.filterDropdown}>
-                    <div className={styles.filterForm}>
-                      <div className={styles.filterField}>
-                        <label>Organization</label>
-                        <select
-                          value={filters.organization}
-                          onChange={(e) =>
-                            handleFilterChange("organization", e.target.value)
-                          }
-                        >
-                          <option value="">Select</option>
-                          <option value="lendsqr">Lendsqr</option>
-                          <option value="irorun">Irorun</option>
-                          <option value="lendstar">Lendstar</option>
-                        </select>
-                      </div>
-
-                      <div className={styles.filterField}>
-                        <label>Username</label>
-                        <input
-                          type="text"
-                          placeholder="User"
-                          value={filters.username}
-                          onChange={(e) =>
-                            handleFilterChange("username", e.target.value)
-                          }
-                        />
-                      </div>
-
-                      <div className={styles.filterField}>
-                        <label>Email</label>
-                        <input
-                          type="email"
-                          placeholder="Email"
-                          value={filters.email}
-                          onChange={(e) =>
-                            handleFilterChange("email", e.target.value)
-                          }
-                        />
-                      </div>
-
-                      <div className={styles.filterField}>
-                        <label>Date</label>
-                        <input
-                          type="date"
-                          placeholder="Date"
-                          value={filters.date}
-                          onChange={(e) =>
-                            handleFilterChange("date", e.target.value)
-                          }
-                        />
-                      </div>
-
-                      <div className={styles.filterField}>
-                        <label>Phone Number</label>
-                        <input
-                          type="tel"
-                          placeholder="Phone Number"
-                          value={filters.phoneNumber}
-                          onChange={(e) =>
-                            handleFilterChange("phoneNumber", e.target.value)
-                          }
-                        />
-                      </div>
-
-                      <div className={styles.filterField}>
-                        <label>Status</label>
-                        <select
-                          value={filters.status}
-                          onChange={(e) =>
-                            handleFilterChange("status", e.target.value)
-                          }
-                        >
-                          <option value="">Select</option>
-                          <option value="active">Active</option>
-                          <option value="inactive">Inactive</option>
-                          <option value="pending">Pending</option>
-                          <option value="blacklisted">Blacklisted</option>
-                        </select>
-                      </div>
-
-                      <div className={styles.filterActions}>
-                        <button
-                          className={styles.btnReset}
-                          onClick={handleResetFilters}
-                        >
-                          Reset
-                        </button>
-                        <button
-                          className={styles.btnFilter}
-                          onClick={handleFilterSubmit}
-                        >
-                          Filter
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-                )}
+                <UsersFilter
+                  showFilterDropdown={showFilterDropdown}
+                  filterRef={filterRef}
+                  filters={filters}
+                  handleResetFilters={handleResetFilters}
+                  handleFilterSubmit={handleFilterSubmit}
+                  handleFilterChange={handleFilterChange}
+                />
               </th>
               <th>
                 <div
@@ -297,12 +366,12 @@ export default function UsersTable({
           <tbody>
             {loadingData ? (
               <tr>
-                <td colSpan={7}>
-                  <Skeleton count={7.5} />
+                <td className={styles.loadingTd} colSpan={7}>
+                  <Skeleton count={4.5} height={68} />
                 </td>
               </tr>
-            ) : users.length > 0 ? (
-              users.map((row: UserProps, index: number) => (
+            ) : paginatedUsers.length > 0 ? (
+              paginatedUsers.map((row: UserProps, index: number) => (
                 <tr key={index}>
                   <td>{row.organization}</td>
                   <td>{row.username}</td>
@@ -326,24 +395,13 @@ export default function UsersTable({
                       >
                         <img src="/icons/tridot.svg" alt="" />
                       </button>
-                      {activeMenuRow === index && (
-                        <div ref={menuRef} className={styles.actionMenu}>
-                          <Link to={`${USERS_ROUTE.link}/${row.id}`}>
-                            <button className={styles.menuItem}>
-                              <img src="/icons/view.svg" alt="" />
-                              View Details
-                            </button>
-                          </Link>
-                          <button className={styles.menuItem}>
-                            <img src="/icons/delete.svg" alt="" />
-                            Blacklist User
-                          </button>
-                          <button className={styles.menuItem}>
-                            <img src="/icons/tick.svg" alt="" />
-                            Activate User
-                          </button>
-                        </div>
-                      )}
+                      <ActionMenu
+                        menuRef={menuRef}
+                        activeMenuRow={activeMenuRow}
+                        index={index}
+                        row={row}
+                        handleUserClick={handleUserClick}
+                      />
                     </div>
                   </td>
                 </tr>
@@ -360,7 +418,7 @@ export default function UsersTable({
       </div>
 
       {/* PAGINATION */}
-      {users.length > 0 && (
+      {paginatedUsers.length > 0 && (
         <div className={styles.pagination}>
           <div className={styles.paginationInfo}>
             <span>Showing</span>
@@ -374,13 +432,13 @@ export default function UsersTable({
               <option value={50}>50</option>
               <option value={100}>100</option>
             </select>
-            <span>out of {totalItems}</span>
+            <span>out of {filteredUsers.length}</span>
           </div>
 
           <div className={styles.paginationControls}>
             <button
               className={styles.paginationArrow}
-              onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
+              onClick={() => handlePageChange(Math.max(1, currentPage - 1))}
               disabled={currentPage === 1}
             >
               <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
@@ -396,9 +454,7 @@ export default function UsersTable({
 
             <button
               className={styles.paginationArrow}
-              onClick={() =>
-                setCurrentPage(Math.min(totalPages, currentPage + 1))
-              }
+              onClick={() => handlePageChange(Math.max(1, currentPage + 1))}
               disabled={currentPage === totalPages}
             >
               <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
